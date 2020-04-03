@@ -22,7 +22,7 @@ SupperTime is an application developed to help with meal prepping. Through Suppe
 
 ## Technologies
 
-- HTMl
+- HTML
 - CSS
 - JAVASCRIPT
 - NODE.JS
