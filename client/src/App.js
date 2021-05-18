@@ -15,7 +15,7 @@ import Login from "./components/auth/login";
 import SignUpForm from "./components/auth/signup";
 
 import { FirebaseContext } from "./components/firebase/context";
-// import Seeds from "./dbseeds";
+import Seeds from "./dbseeds";
 
 const initialState = {
   headerState: "main",
@@ -23,14 +23,14 @@ const initialState = {
   username: "",
   ingredients: {},
   queuedRecipes: [],
-  shoppingList: {}
+  shoppingList: {},
 };
 
 class App extends React.Component {
   state = { ...initialState };
 
   componentDidMount() {
-    this.props.firebase.auth.onAuthStateChanged(authUser => {
+    this.props.firebase.auth.onAuthStateChanged((authUser) => {
       this.setState({ authUser });
 
       if (this.state.authUser) {
@@ -70,7 +70,7 @@ class App extends React.Component {
       const recipe = mealPlan[meal];
 
       // forEach and forIn are async, there's probably a cleaner way to do this
-      recipe.ingredients.forEach(ingredient => {
+      recipe.ingredients.forEach((ingredient) => {
         if (!groceries[ingredient.name]) {
           groceries[ingredient.name] = 0;
         }
@@ -90,12 +90,12 @@ class App extends React.Component {
     this.setState({ shoppingList: groceries });
   }
 
-  loadPantry = email => {
-    API.getUser(email).then(user => {
+  loadPantry = (email) => {
+    API.getUser(email).then((user) => {
       this.setState({
         username: user.data.username,
         ingredients: user.data.ingredients || {},
-        queuedRecipes: user.data.queuedRecipes
+        queuedRecipes: user.data.queuedRecipes,
       });
 
       this.generateList(user.data.queuedRecipes);
@@ -103,18 +103,18 @@ class App extends React.Component {
   };
 
   // Will be passed as prop to Recipes and Shoplist
-  addToQueue = recipe => {
-    API.getUser(this.state.authUser.email).then(user => {
+  addToQueue = (recipe) => {
+    API.getUser(this.state.authUser.email).then((user) => {
       const newRecipes = user.data.queuedRecipes;
       newRecipes.push(recipe);
       API.updateUser(this.state.authUser.email, {
-        queuedRecipes: newRecipes
+        queuedRecipes: newRecipes,
       }).then(() => this.loadPantry(this.state.authUser.email));
     });
   };
 
-  removeFromQueue = recipeName => {
-    API.getUser(this.state.authUser.email).then(user => {
+  removeFromQueue = (recipeName) => {
+    API.getUser(this.state.authUser.email).then((user) => {
       const newRecipes = user.data.queuedRecipes;
       for (let i = 0; i < user.data.queuedRecipes.length; i++) {
         if (newRecipes[i].name === recipeName) {
@@ -122,13 +122,13 @@ class App extends React.Component {
         }
       }
       API.updateUser(this.state.authUser.email, {
-        queuedRecipes: newRecipes
+        queuedRecipes: newRecipes,
       }).then(() => this.loadPantry(this.state.authUser.email));
     });
   };
   //Removes a recipe from the user's queue and also uses the correct amount of ingredients from the user's pantry
-  cookRecipe = recipeName => {
-    API.getUser(this.state.authUser.email).then(user => {
+  cookRecipe = (recipeName) => {
+    API.getUser(this.state.authUser.email).then((user) => {
       for (const recipe of user.data.queuedRecipes) {
         if (recipe.name === recipeName) {
           const ingredientsNeeded = recipe.ingredients;
@@ -139,7 +139,7 @@ class App extends React.Component {
           }
           this.removeFromQueue(recipeName);
           API.updateUser(this.state.authUser.email, {
-            ingredients: newIngredients
+            ingredients: newIngredients,
           });
         }
       }
@@ -150,7 +150,7 @@ class App extends React.Component {
     return (
       <Router>
         <FirebaseContext.Consumer>
-          {firebase => (
+          {(firebase) => (
             <Header
               headerState={this.state.headerState}
               openLogin={this.openLogin}
@@ -162,9 +162,9 @@ class App extends React.Component {
           )}
         </FirebaseContext.Consumer>
         <Switch>
-          {/* <Route path="/seeds">
+          <Route path="/seeds">
             <Seeds />
-          </Route> */}
+          </Route>
           <Route path="/pantry">
             {this.state.authUser ? (
               <>
@@ -200,7 +200,7 @@ class App extends React.Component {
         </Switch>
         {this.state.headerState === "login" ? (
           <FirebaseContext.Consumer>
-            {firebase => (
+            {(firebase) => (
               <Login
                 firebase={firebase}
                 openLogin={this.openLogin}
@@ -210,7 +210,7 @@ class App extends React.Component {
           </FirebaseContext.Consumer>
         ) : this.state.headerState === "signup" ? (
           <FirebaseContext.Consumer>
-            {firebase => (
+            {(firebase) => (
               <SignUpForm
                 firebase={firebase}
                 openSignup={this.openSignup}
